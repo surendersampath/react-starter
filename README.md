@@ -1,10 +1,24 @@
-# Getting Started with Create React App
+# Getting Started with React in vscode dev containers
+
+## Table of Contents
+- [Overview](#Overview)
+- [Starting off project in local environment](#starting-off-in-local-environment)
+- [Starting off in vscode dev container](#starting-off-in-vscode-dev-container)
+    - [Pre-requisites for dev containers](#prerequisites)
+    - [Run app inside dev container](#run-app-inside-dev-container)
+- [Other commands](#other-commands)
+
+## Overview
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Starting off in local environment
 
 In the project directory, you can run:
+
+### `npm install`
+
+Installs all dependencies needed to run the app
 
 ### `npm start`
 
@@ -13,6 +27,94 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
+
+## Starting off in vscode dev container
+
+You can get started with react using vscode dev container. Make sure you have these pre-requisities installed
+
+### Prerequisites
+
+- Make sure you have docker running. For windows you can install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/#:~:text=Docker%20only%20supports%20Docker%20Desktop%20on%20Windows%20for,as%20Windows%20Server%202019%20or%20Windows%20Server%202022.) manually.
+Alternatively you can also run below powershell script to install wsl2 and docker desktop
+
+```powershell
+## Install wsl
+wsl --install
+
+# Set WSL 2 as default version
+wsl --set-default-version 2
+
+# Install a specific Linux distribution (e.g., Ubuntu)
+wsl --install -d Ubuntu
+
+## Download docker desktop
+Invoke-WebRequest -Uri https://desktop.docker.com/win/stable/Docker%20Desktop%20Installer.exe -OutFile DockerDesktopInstaller.exe
+
+# Install Docker Desktop
+Start-Process -Wait -FilePath .\DockerDesktopInstaller.exe -ArgumentList 'install', '--accept-license', '--always-run-service'
+
+# Clean up the installer file
+Remove-Item .\DockerDesktopInstaller.exe
+
+# System restarts, after that do these
+
+# Verify Docker installation
+docker --version
+
+# Run a test Docker container
+docker run hello-world
+```
+
+- Make sure you have [vscode](https://code.visualstudio.com/download) installed and extension [Dev Containers extension](vscode:extension/ms-vscode-remote.remote-containers)
+Alternatively you can also run below powershell script to setup these
+
+```powershell
+## Install chocolatey and apps
+
+try {
+    choco config get cacheLocation
+}
+catch {
+    Write-Output "Chocolatey not detected, trying to install now"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
+$chocolateyAppList = 'git.install|2.41.0,vscode|1.91.1,materialicon-vscode|4.28.0'
+
+$appsToInstall = $chocolateyAppList -split "," | foreach { "$($_.Trim())" }
+
+foreach ($app in $appsToInstall) {
+
+    $name = $app.Split("|")[0]
+    $version = $app.Split("|")[1]
+    $params = $app.Split("|")[2]
+    
+    Write-Host "Installing: $name | $version with extra params: [$params]"
+
+    if ($null -eq $params) {
+        Write-Host "choco install $name --version $version  /y -Force | Write-Output"
+        & choco install $name --version $version  /y -Force | Write-Output
+    }
+    else {
+        Write-Host "Installing: $name | $version"
+        & choco install $name --version $version  --params $params /y -Force | Write-Output
+    }
+}
+
+Start-Process "C:\Program Files\Microsoft VS Code\bin\code.cmd" -ArgumentList "--install-extension","ms-vscode-remote.remote-containers","--force" -wait
+```
+
+### Run app inside dev container
+
+- Git clone this repo
+- Go to the repo root and open project in vscode.
+- Once you have Dev Containers extension installed and docker running, vscode will prompt you to open the folder in container. You have two options:
+    - Reopen in dev container: Files stay where they are and you work on them directly from the linked docker volume.
+    - Clone in volume: Preferred for windows users with wsl2. It clones a copy of the project into a docker container and volume. This options is faster on windows.
+
+![dev-container](./images/dev-container.png)
+
+## Other commands
 
 ### `npm test`
 
@@ -29,42 +131,4 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
